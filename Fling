@@ -121,9 +121,10 @@ TextButton.MouseButton1Click:Connect(function()
                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
                     local BV = Instance.new("BodyVelocity")
                     BV.Parent = player.Character.HumanoidRootPart
-                    BV.Velocity = Vector3.new(0, 50, 0) -- Поднимаем игрока или можете настроить
+                    BV.Velocity = Vector3.new(0, 50, 0) -- Поднимаем игрока
                     BV.MaxForce = Vector3.new(4000, 4000, 4000)
 
+                    -- Составляем нажатие на кнопку флинга
                     wait(1) -- Задержка перед удалением
                     BV:Destroy()
                 end
