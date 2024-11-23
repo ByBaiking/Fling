@@ -1,0 +1,160 @@
+local lp = game:GetService("Players").LocalPlayer
+
+local function gplr(String)
+    local Found = {}
+    local strl = String:lower()
+    if strl == "all" then
+        for _,v in pairs(game:GetService("Players"):GetPlayers()) do
+            table.insert(Found,v)
+        end
+    elseif strl == "others" then
+        for _,v in pairs(game:GetService("Players"):GetPlayers()) do
+            if v.Name ~= lp.Name then
+                table.insert(Found,v)
+            end
+        end
+    elseif strl == "me" then
+        for _,v in pairs(game:GetService("Players"):GetPlayers()) do
+            if v.Name == lp.Name then
+                table.insert(Found,v)
+            end
+        end
+    else
+        for _,v in pairs(game:GetService("Players"):GetPlayers()) do
+            if v.Name:lower():sub(1, #String) == strl or v.DisplayName:lower():sub(1, #String) == strl then
+                table.insert(Found,v)
+            end
+        end
+    end
+    return Found
+end
+
+local h = Instance.new("ScreenGui")
+local Main = Instance.new("ImageLabel")
+local Top = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local TextBox = Instance.new("TextBox")
+local TextButton = Instance.new("TextButton")
+local PlayerList = Instance.new("ScrollingFrame")
+local PlayerListLayout = Instance.new("UIListLayout")
+
+h.Name = "h"
+h.Parent = game:GetService("CoreGui")
+h.ResetOnSpawn = false
+
+Main.Name = "Main"
+Main.Parent = h
+Main.Active = true
+Main.Draggable = true
+Main.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+Main.BorderSizePixel = 0
+Main.Position = UDim2.new(0.3, 0, 0.3, 0)
+Main.Size = UDim2.new(0, 300, 0, 400)
+Main.Image = "rbxassetid://16336200609"
+
+Top.Name = "Top"
+Top.Parent = Main
+Top.BackgroundColor3 = Color3.fromRGB(0, 90, 0)
+Top.BorderSizePixel = 0
+Top.Size = UDim2.new(1, 0, 0, 30)
+
+Title.Name = "Title"
+Title.Parent = Top
+Title.BackgroundColor3 = Color3.fromRGB(0, 60, 0)
+Title.BorderSizePixel = 0
+Title.Position = UDim2.new(0, 0, 0.295454562, 0)
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.Font = Enum.Font.SourceSans
+Title.Text = "Fling GUI"
+Title.TextColor3 = Color3.fromRGB(0, 255, 0)
+Title.TextScaled = true
+Title.TextSize = 14.000
+Title.TextWrapped = true
+
+TextBox.Parent = Main
+TextBox.BackgroundColor3 = Color3.fromRGB(0, 99, 0)
+TextBox.BorderSizePixel = 0
+TextBox.Position = UDim2.new(0.05, 0, 0.3, 0)
+TextBox.Size = UDim2.new(0.9, 0, 0.1, 0)
+TextBox.Font = Enum.Font.SourceSans
+TextBox.PlaceholderText = "Input username or display"
+TextBox.Text = ""
+TextBox.TextColor3 = Color3.fromRGB(0, 255, 20)
+TextBox.TextScaled = true
+TextBox.TextSize = 14.000
+TextBox.TextWrapped = true
+
+-- Список игроков
+PlayerList.Name = "PlayerList"
+PlayerList.Parent = Main
+PlayerList.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+PlayerList.Position = UDim2.new(0.05, 0, 0.42, 0)
+PlayerList.Size = UDim2.new(0.9, 0, 0.48, 0)
+PlayerList.ScrollBarThickness = 10
+
+PlayerListLayout.Parent = PlayerList
+PlayerListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+PlayerListLayout.Padding = UDim.new(0, 5)
+
+local function updatePlayerList()
+    for _,v in ipairs(PlayerList:GetChildren()) do
+        if v:IsA("TextButton") then
+            v:Destroy()
+        end
+    end
+
+    for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+        if player ~= lp then
+            local button = Instance.new("TextButton")
+            button.Size = UDim2.new(1, 0, 0, 30)
+            button.Text = player.Name
+            button.TextColor3 = Color3.fromRGB(0, 255, 0)
+            button.BackgroundColor3 = Color3.fromRGB(0, 99, 0)
+            button.Parent = PlayerList
+
+            button.MouseButton1Click:Connect(function()
+                TextBox.Text = player.Name
+            end)
+        end
+    end
+end
+
+-- Обновляем список игроков
+updatePlayerList()
+
+TextButton.Parent = Main
+TextButton.BackgroundColor3 = Color3.fromRGB(0, 99, 0)
+TextButton.BorderSizePixel = 0
+TextButton.Position = UDim2.new(0.1, 0, 0.75, 0)
+TextButton.Size = UDim2.new(0.8, 0, 0.1, 0)
+TextButton.Font = Enum.Font.SourceSans
+TextButton.Text = "Fling player"
+TextButton.TextColor3 = Color3.fromRGB(0, 255, 0)
+TextButton.TextScaled = true
+TextButton.TextSize = 14.000
+TextButton.TextWrapped = true
+
+TextButton.MouseButton1Click:Connect(function()
+    local Target = gplr(TextBox.Text)
+    if Target[1] then
+        Target = Target[1]
+        -- (А здесь ваш код для флинга игрока)
+    else
+        print("Игрок не найден")
+    end
+end)
+
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 36, 0, 37)
+closeButton.Position = UDim2.new(0.5, 113, 0.5, -94)
+closeButton.BackgroundColor3 = Color3.new(0.8, 0, 0)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.Parent = Main
+closeButton.MouseButton1Click:Connect(function()
+    h:Destroy()
+end)
+
+-- Обновление списка игроков при добавлении/удалении игрока
+game:GetService("Players").PlayerAdded:Connect(updatePlayerList)
+game:GetService("Players").PlayerRemoving:Connect(updatePlayerList)
